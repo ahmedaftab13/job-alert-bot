@@ -1,0 +1,39 @@
+name: Daily Job Alert Automation
+
+on:
+  schedule:
+    # 04:00 UTC = 09:00 Pakistan Time (PKT)
+    - cron: "0 4 * * *"
+
+  workflow_dispatch:  # allows manual run from GitHub
+
+jobs:
+  run-job-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout repository
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      # 3. Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests beautifulsoup4
+
+      # 4. Run scraper and send email
+      - name: Run job scraper and email sender
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+        run: |
+          python scraper.py > output.txt
+          python -c "from scraper import get_all_jobs; from send_email import send_email; jobs = get_all_jobs(); send_email(jobs)"
