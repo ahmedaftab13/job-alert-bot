@@ -1,0 +1,8 @@
+job-alert-bot/
+├── scraper.py
+├── send_email.py
+├── requirements.txt
+├── jobs_seen.json
+└── .github/
+    └── workflows/
+        └── daily_jobs.yml
